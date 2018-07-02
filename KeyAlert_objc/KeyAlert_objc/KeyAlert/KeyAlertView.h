@@ -18,19 +18,20 @@ typedef void (^CallBackBlock)(NSUInteger, KeyAlertView *);
 @property (nonatomic, retain) NSString *message;
 @property (nonatomic, retain) NSArray *buttonTitles;
 
-@property (nonatomic, strong) UIView *vwContent;
+@property (weak, nonatomic) IBOutlet UIView *vwContent;
 
 //title
-@property (nonatomic, strong) UIView *vwTop;
-@property (nonatomic, strong) UILabel *lbTitle;
-@property (nonatomic, strong) UIImageView *imgTitle;
+@property (weak, nonatomic) IBOutlet UIView *vwTop;
+@property (weak, nonatomic) IBOutlet UILabel *lbTitle;
+@property (weak, nonatomic) IBOutlet UIImageView *imgTitle;
 
 
-@property (nonatomic, strong) UIScrollView *svwContent;
-@property (nonatomic, strong) UILabel *lbContent;
+@property (weak, nonatomic) IBOutlet UIScrollView *svwContent;
+@property (weak, nonatomic) IBOutlet UILabel *lbContent;
 
 
-@property (nonatomic, strong) UIView *vwBot;
+@property (weak, nonatomic) IBOutlet UIView *vwBot;
+@property (strong, nonatomic) IBOutlet UIView *vwArrCustomBtn;
 
 
 

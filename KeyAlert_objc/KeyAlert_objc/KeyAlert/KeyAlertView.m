@@ -125,41 +125,7 @@
 
 - (void)viewInitialized {
     
-    _vwContent = [[UIView alloc] init];
     _vwContent.layer.cornerRadius = 10;
-    _vwContent.clipsToBounds = YES;
-    _vwContent.backgroundColor = [UIColor whiteColor];
-    [self.view addSubview:_vwContent];
-    
-    _vwTop = [[UIView alloc] init];
-    _vwTop.backgroundColor = [UIColor lightGrayColor];
-    [_vwContent addSubview:_vwTop];
-    
-    _lbTitle = [[UILabel alloc] init];
-    _lbTitle.textAlignment = NSTextAlignmentCenter;
-    [_vwTop addSubview:_lbTitle];
-    
-    _imgTitle = [[UIImageView alloc] init];
-    [_vwTop addSubview:_imgTitle];
-    
-    _lbContent = [[UILabel alloc] initWithFrame:CGRectMake(_contentLabelSpase.left,
-                                                           _contentLabelSpase.top,
-                                                           _popupSize.width - (_contentLabelSpase.left + _contentLabelSpase.right),
-                                                           1)];
-    _lbContent.lineBreakMode = NSLineBreakByWordWrapping;
-    _lbContent.numberOfLines = 0;
-    _lbContent.textAlignment = NSTextAlignmentCenter;
-    
-    _svwContent = [[UIScrollView alloc] init];
-    _svwContent.backgroundColor = [UIColor whiteColor];
-    _svwContent.showsVerticalScrollIndicator = NO;
-    _svwContent.showsHorizontalScrollIndicator = NO;
-    
-    [_vwContent addSubview:_svwContent];
-    [_svwContent addSubview:_lbContent];
-    
-    _vwBot = [[UIView alloc] init];
-    [_vwContent addSubview:_vwBot];
     
     buttons = [NSMutableArray new];
 }
@@ -182,10 +148,15 @@
     //mid
     _lbContent.text = _message;
     [_lbContent sizeToFit];
-    _lbContent.frame = CGRectMake(_contentLabelSpase.left,
-                                  _contentLabelSpase.top,
-                                  _popupSize.width - (_contentLabelSpase.left + _contentLabelSpase.right),
-                                  _lbContent.frame.size.height);
+    _lbContent.frame = (_lbContent.frame.size.height < _popupSize.mMinHeight - (_contentLabelSpase.top + _contentLabelSpase.bottom))?
+    CGRectMake(_contentLabelSpase.left,
+               _contentLabelSpase.top,
+               _popupSize.width - (_contentLabelSpase.left + _contentLabelSpase.right),
+               _popupSize.mMinHeight - (_contentLabelSpase.top + _contentLabelSpase.bottom)):
+    CGRectMake(_contentLabelSpase.left,
+               _contentLabelSpase.top,
+               _popupSize.width - (_contentLabelSpase.left + _contentLabelSpase.right),
+               _lbContent.frame.size.height);
     
     
     if(_lbContent.frame.size.height < _popupSize.mMaxHeight) {
@@ -196,7 +167,8 @@
         _svwContent.scrollEnabled = NO;
         _svwContent.contentSize = CGSizeMake(_svwContent.frame.size.width,
                                              _svwContent.frame.size.height);
-    }else{
+    }
+    else{
         _svwContent.frame = CGRectMake(0,
                                        _popupSize.tHeight,
                                        _popupSize.width,
@@ -234,12 +206,13 @@
         
         UIButton *btn = (UIButton *)[self.view viewWithTag:cnt + 100];
         if(btn == nil){
-            btn = [UIButton buttonWithType:UIButtonTypeCustom];
+            btn = (UIButton *)[_vwArrCustomBtn viewWithTag:cnt + 100];
+            
             btn.tag = cnt + 100;
             btn.layer.cornerRadius = 5;
             [btn addTarget:self action:@selector(btnPress:) forControlEvents:UIControlEventTouchUpInside];
-            btn.tintColor = [UIColor whiteColor];
-            btn.backgroundColor = [UIColor colorWithRed:0.00 green:0.44 blue:1.00 alpha:1.0];
+            
+            [_vwBot addSubview:btn];
         }
         [btn setTitle:btnTitle forState:UIControlStateNormal];
         
@@ -255,7 +228,6 @@
                                    realBtnH);
         }
         cnt++;
-        [_vwBot addSubview:btn];
         [buttons addObject:btn];
     }
     
@@ -275,7 +247,7 @@
 
 - (void)dismissViewController {
     for (UIButton *btn in buttons){
-        [btn removeFromSuperview];
+        btn.frame = CGRectZero;
     }
     [buttons removeAllObjects];
     [self dismissViewControllerAnimated:NO completion:nil];
