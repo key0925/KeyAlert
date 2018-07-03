@@ -8,6 +8,11 @@
 
 #import "KeyAlert.h"
 
+#define default_Max_MsgLabel_width          [UIScreen mainScreen].bounds.size.width - 60
+#define default_Max_MsgLabel_height         30
+#define default_MsgLabel_Horizontal_Space   20
+#define default_MsgLabel_vertical_Space     5
+
 @implementation KeyAlert
 @synthesize alertView;
 
@@ -39,6 +44,67 @@
     
     [self shared].alertView.modalPresentationStyle = UIModalPresentationOverCurrentContext;
     [target presentViewController:[self shared].alertView animated:NO completion:nil];
+    
+}
+
++ (void)toastWithMessage:(nullable NSString *)message
+               completed:(nullable ToastCompleted)completed {
+    
+    UIWindow *window = [[UIApplication sharedApplication] keyWindow];
+    
+    UILabel *lbMsg = [[UILabel alloc] init];
+    
+    lbMsg.lineBreakMode = NSLineBreakByWordWrapping;
+    lbMsg.numberOfLines = 0;
+    lbMsg.font = [UIFont systemFontOfSize:13];
+    lbMsg.textColor = [UIColor whiteColor];
+    
+    CGSize maxSize = CGSizeMake(default_Max_MsgLabel_width, default_Max_MsgLabel_height);
+    CGRect expectedLabelRect = [message boundingRectWithSize:maxSize options:NSStringDrawingUsesLineFragmentOrigin attributes:@{ NSFontAttributeName:lbMsg.font } context:nil];
+    expectedLabelRect.origin.x = default_MsgLabel_Horizontal_Space;
+    expectedLabelRect.origin.y = default_MsgLabel_vertical_Space;
+    lbMsg.frame = expectedLabelRect;
+    lbMsg.text = message;
+    
+    float lbMsg_Width = lbMsg.frame.size.width;
+    
+    float toastPosisionX = ([UIScreen mainScreen].bounds.size.width - lbMsg_Width)/2 - default_MsgLabel_vertical_Space;
+    
+    float toastPosisionY = [UIScreen mainScreen].bounds.size.height - 80;
+    
+    
+    
+    UIView *toast = [[UIView alloc] initWithFrame:CGRectMake(toastPosisionX,
+                                                             [UIScreen mainScreen].bounds.size.height,
+                                                             lbMsg_Width + default_MsgLabel_Horizontal_Space * 2,
+                                                             lbMsg.frame.size.height + default_MsgLabel_vertical_Space * 2)];
+
+    toast.backgroundColor = [UIColor grayColor];
+    toast.layer.cornerRadius = 10;
+    
+    [toast addSubview:lbMsg];
+    [window addSubview:toast];
+    
+    [UIView animateWithDuration:0.3 animations:^{
+        toast.frame = CGRectMake(toast.frame.origin.x,
+                                 toastPosisionY,
+                                 lbMsg_Width + 40,
+                                 toast.frame.size.height);
+        toast.alpha = 1;
+    } completion:^(BOOL finished){
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [UIView animateWithDuration:0.3 animations:^{
+                toast.frame = CGRectMake(toast.frame.origin.x,
+                                         [UIScreen mainScreen].bounds.size.height,
+                                         lbMsg_Width + 40,
+                                         toast.frame.size.height);
+                toast.alpha = 0;
+            } completion:^(BOOL finished){
+                [toast removeFromSuperview];
+                if(completed)completed();
+            }];
+        });
+    }];
     
 }
 

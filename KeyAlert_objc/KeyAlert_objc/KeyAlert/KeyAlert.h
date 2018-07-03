@@ -13,6 +13,8 @@
 
 @property (nonatomic, strong)KeyAlertView *alertView;
 
+typedef void (^ToastCompleted)(void);
+
 + (void)alertShowWithMessage:(nullable NSString *)message
                       target:(nonnull UIViewController *)target
                 buttonTitles:(nullable NSArray *)buttonTitles
@@ -36,4 +38,8 @@
                    contentTobtn:(float)contentTobtn;
 
 + (void)resetStruct;
+
+
++ (void)toastWithMessage:(nullable NSString *)message
+               completed:(nullable ToastCompleted)completed;
 @end

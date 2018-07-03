@@ -46,8 +46,12 @@
     }];
 }
 - (IBAction)btnPress2:(id)sender {
-    [KeyAlert alertShowWithMessage:@"test" target:self buttonTitles:@[@"확인"] callBack:^(NSUInteger index, KeyAlertView *alert){
-        [alert dismissViewController];
+//    [KeyAlert alertShowWithMessage:@"test" target:self buttonTitles:@[@"확인"] callBack:^(NSUInteger index, KeyAlertView *alert){
+//        [alert dismissViewController];
+//    }];
+    
+    [KeyAlert toastWithMessage:@"Test Toas" completed:^{
+        NSLog(@"test");
     }];
 }
 
