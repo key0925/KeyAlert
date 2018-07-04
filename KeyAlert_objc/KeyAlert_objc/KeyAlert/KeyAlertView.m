@@ -41,6 +41,7 @@
     
     //뷰 생성
     [self viewInitialized];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(OrientationDidChange:) name:UIDeviceOrientationDidChangeNotification object:nil];
     
 }
 
@@ -57,7 +58,16 @@
     // Dispose of any resources that can be recreated.
 }
 
-
+- (void)OrientationDidChange:(NSNotification *)noti {
+    NSLog(@"OrientationDidChange");
+    [self resetStruct];
+    [self setViewFrame];
+    if(UIDeviceOrientationIsLandscape([UIDevice currentDevice].orientation)){
+        NSLog(@"Land");
+    }else{
+        NSLog(@"Port");
+    }
+}
 
 
 #pragma mark - Setting View
@@ -146,18 +156,14 @@
     _imgTitle.image = [UIImage imageNamed:default_title_imageName];
     
     //mid
+    
+    CGSize maxSize = CGSizeMake(_popupSize.width - (_contentLabelSpase.left + _contentLabelSpase.right), _popupSize.mMaxHeight);
+    CGRect expectedLabelRect = [_message boundingRectWithSize:maxSize options:NSStringDrawingUsesLineFragmentOrigin attributes:@{ NSFontAttributeName:_lbContent.font } context:nil];
+    expectedLabelRect.origin.x = _contentLabelSpase.left;
+    expectedLabelRect.origin.y = _contentLabelSpase.top;
+    _lbContent.frame = expectedLabelRect;
     _lbContent.text = _message;
     [_lbContent sizeToFit];
-    _lbContent.frame = (_lbContent.frame.size.height < _popupSize.mMinHeight - (_contentLabelSpase.top + _contentLabelSpase.bottom))?
-    CGRectMake(_contentLabelSpase.left,
-               _contentLabelSpase.top,
-               _popupSize.width - (_contentLabelSpase.left + _contentLabelSpase.right),
-               _popupSize.mMinHeight - (_contentLabelSpase.top + _contentLabelSpase.bottom)):
-    CGRectMake(_contentLabelSpase.left,
-               _contentLabelSpase.top,
-               _popupSize.width - (_contentLabelSpase.left + _contentLabelSpase.right),
-               _lbContent.frame.size.height);
-    
     
     if(_lbContent.frame.size.height < _popupSize.mMaxHeight) {
         _svwContent.frame = CGRectMake(0,
