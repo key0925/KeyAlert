@@ -68,7 +68,7 @@
     
     float lbMsg_Width = lbMsg.frame.size.width;
     
-    float toastPosisionX = ([UIScreen mainScreen].bounds.size.width - lbMsg_Width)/2 - default_MsgLabel_vertical_Space;
+    float toastPosisionX = ([UIScreen mainScreen].bounds.size.width - (lbMsg_Width + default_MsgLabel_Horizontal_Space * 2))/2;
     
     float toastPosisionY = [UIScreen mainScreen].bounds.size.height - 80;
     
