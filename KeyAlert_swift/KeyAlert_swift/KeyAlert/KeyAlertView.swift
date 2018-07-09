@@ -16,6 +16,20 @@ class KeyAlertView: UIViewController {
     public var CallBackBlock: ((Int, UIViewController) -> Void)?
     
     
+    @IBOutlet weak var vwContent: UIView!
+    
+    @IBOutlet weak var vwTop: UIView!
+    @IBOutlet weak var lbTitle: UILabel!
+    @IBOutlet weak var imgTitle: UIImageView!
+    
+    @IBOutlet weak var svwContent: UIScrollView!
+    @IBOutlet weak var lbContent: UILabel!
+    
+    @IBOutlet weak var vwBot: UIView!
+    @IBOutlet var vwArrCustomBtn: UIView!
+    
+    
+    
     let default_title_string: String = Bundle.main.object(forInfoDictionaryKey: "CFBundleDisplayName") as! String
     let default_title_imageName: String = ""
     
@@ -35,6 +49,7 @@ class KeyAlertView: UIViewController {
     
     
     
+    var buttons: Array<UIButton>?
     
     
     
@@ -74,16 +89,25 @@ class KeyAlertView: UIViewController {
         // Do any additional setup after loading the view.
         
         self.resetStruct()
+        self.viewInitialized()
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(OrientationDidChange(noti:)), name: NSNotification.Name.UIDeviceOrientationDidChange, object: nil)
     }
 
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        self.setViewFrame()
+    }
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
     
-
-    @IBAction func btnTestPress(_ sender: Any) {
-        CallBackBlock!(0,self)
+    
+    @objc func OrientationDidChange(noti:Notification) -> Void {
+        self.resetStruct()
+        self.setViewFrame()
     }
     
     func resetStruct() -> Void {
@@ -128,4 +152,129 @@ class KeyAlertView: UIViewController {
         buttonSpase.btnTobtn     = btnTobtn
         buttonSpase.contentTobtn = contentTobtn
     }
+    
+    func viewInitialized() -> Void {
+        
+        vwContent.layer.cornerRadius = 10;
+        
+    }
+    func setViewFrame() -> Void {
+        //top
+        vwTop.frame = CGRect(x: 0,
+                             y: 0,
+                             width: popupSize.width,
+                             height: popupSize.tHeight)
+        
+        lbTitle.frame = vwTop.bounds
+        lbTitle.text = default_title_string
+        imgTitle.frame = vwTop.bounds
+        imgTitle.image = UIImage(named: default_title_imageName)
+        
+        
+        //mid
+        
+        let maxSize: CGSize = CGSize(width: popupSize.width - (contentLabelSpase.left + contentLabelSpase.right),
+                                     height: popupSize.mMaxHeight)
+        var expectedLabelRect = message.boundingRect(with: maxSize, options: .usesLineFragmentOrigin, attributes: [NSAttributedStringKey.font: lbContent.font], context: nil)
+        expectedLabelRect.origin.x = contentLabelSpase.left
+        expectedLabelRect.origin.y = contentLabelSpase.top
+        expectedLabelRect.size.width = popupSize.width - (contentLabelSpase.left + contentLabelSpase.right)
+        lbContent.frame = expectedLabelRect
+        lbContent.text = message
+        
+        if lbContent.frame.size.height < popupSize.mMaxHeight {
+            svwContent.frame = CGRect(x: 0,
+                                      y: popupSize.tHeight,
+                                      width: popupSize.width,
+                                      height: lbContent.frame.size.height + (contentLabelSpase.top + contentLabelSpase.bottom))
+            svwContent.isScrollEnabled = false
+            svwContent.contentSize = CGSize(width: svwContent.frame.size.width,
+                                            height: svwContent.frame.size.height)
+        }
+        else {
+            svwContent.frame = CGRect(x: 0,
+                                      y: popupSize.tHeight,
+                                      width: popupSize.width,
+                                      height: popupSize.mMaxHeight)
+            svwContent.isScrollEnabled = true
+            svwContent.contentSize = CGSize(width: svwContent.frame.size.width,
+                                            height: lbContent.frame.size.height + (contentLabelSpase.top + contentLabelSpase.bottom))
+        }
+        
+        
+        //bottom
+        var btnCnt: CGFloat = CGFloat((buttonTitles?.count)!)    //버튼 갯수
+        if btnCnt == 0 {
+            btnCnt = 1
+        }
+        
+        let realBtnH: CGFloat = popupSize.bHeight - buttonSpase.contentTobtn //실제 버튼 높이
+        var realBtnW: CGFloat = 0 //실제 버튼 넓이
+        
+        if btnCnt < 3 {
+            realBtnW = (popupSize.width - (buttonSpase.contentTobtn * 2 + buttonSpase.btnTobtn * (btnCnt - 1))) / btnCnt
+            vwBot.frame = CGRect(x: 0,
+                                 y: popupSize.tHeight + svwContent.frame.size.height,
+                                 width: popupSize.width,
+                                 height: popupSize.bHeight)
+        }
+        else {
+            realBtnW = popupSize.width - (buttonSpase.contentTobtn * 2)
+            vwBot.frame = CGRect(x: 0,
+                                 y: popupSize.tHeight + svwContent.frame.size.height,
+                                 width: popupSize.width,
+                                 height: (realBtnH + buttonSpase.btnTobtn) * (btnCnt - 1) + popupSize.bHeight)
+        }
+
+        var cnt: CGFloat = 0
+
+        for btnTitle in buttonTitles! {
+            var btn: UIButton? = self.view.viewWithTag(Int(cnt + 100)) as? UIButton
+            if btn == nil {
+                btn = vwArrCustomBtn.viewWithTag(Int(cnt + 100)) as? UIButton
+                btn?.tag = Int(cnt + 100)
+                btn?.layer.cornerRadius = 5
+                btn?.addTarget(self, action:#selector(btnPress(btn:)), for: .touchUpInside)
+                vwBot.addSubview(btn!)
+            }
+            btn?.setTitle(btnTitle, for: .normal)
+
+            if btnCnt < 3 {
+                btn?.frame = CGRect(x: buttonSpase.contentTobtn + (realBtnW + buttonSpase.btnTobtn) * cnt,
+                                    y: 0,
+                                    width: realBtnW,
+                                    height: realBtnH)
+            }else{
+                btn?.frame = CGRect(x:buttonSpase.contentTobtn,
+                                    y: (realBtnH + buttonSpase.btnTobtn) * cnt,
+                                    width: realBtnW,
+                                    height: realBtnH)
+            }
+            buttons?.insert(btn!, at: Int(cnt))
+            cnt = cnt + 1;
+        }
+
+
+        vwContent.frame = CGRect(x: (UIScreen.main.bounds.size.width - popupSize.width)/2 + moveCenterPosision.x,
+                                 y: (UIScreen.main.bounds.size.height - (popupSize.tHeight + svwContent.frame.size.height + vwBot.frame.size.height))/2 + moveCenterPosision.y,
+                                 width: popupSize.width,
+                                 height: popupSize.tHeight + svwContent.frame.size.height + vwBot.frame.size.height)
+    }
+
+    @objc func btnPress (btn: UIButton) -> Void {
+        if CallBackBlock != nil {
+            CallBackBlock!(btn.tag, self)
+        }else {
+            self.dismissViewController()
+        }
+    }
+    
+    func dismissViewController() -> Void {
+        for btn in buttons! {
+            btn.frame = CGRect(x: 0, y: 0, width: 0, height: 0)
+        }
+        buttons?.removeAll()
+        self.dismiss(animated: false, completion: nil)
+    }
+
 }

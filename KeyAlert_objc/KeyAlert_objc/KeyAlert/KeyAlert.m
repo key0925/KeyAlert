@@ -36,7 +36,7 @@
 
 + (void)alertShowWithMessage:(nullable NSString *)message
                       target:(nonnull UIViewController *)target
-                buttonTitles:(nullable NSArray *)buttonTitles
+                buttonTitles:(nonnull NSArray *)buttonTitles
                     callBack:(nullable CallBackBlock)callBack {
     
     [self shared].alertView.message       = message;

@@ -161,9 +161,9 @@
     CGRect expectedLabelRect = [_message boundingRectWithSize:maxSize options:NSStringDrawingUsesLineFragmentOrigin attributes:@{ NSFontAttributeName:_lbContent.font } context:nil];
     expectedLabelRect.origin.x = _contentLabelSpase.left;
     expectedLabelRect.origin.y = _contentLabelSpase.top;
+    expectedLabelRect.size.width = _popupSize.width - (_contentLabelSpase.left + _contentLabelSpase.right);
     _lbContent.frame = expectedLabelRect;
     _lbContent.text = _message;
-    [_lbContent sizeToFit];
     
     if(_lbContent.frame.size.height < _popupSize.mMaxHeight) {
         _svwContent.frame = CGRectMake(0,
@@ -245,7 +245,7 @@
 
 - (void)btnPress:(UIButton *)btn {
     if(_callBackBlock == nil){
-        [self dismissViewControllerAnimated:NO completion:nil];
+        [self dismissViewController];
     }else{
         _callBackBlock(btn.tag - 100, self);
     }

@@ -21,9 +21,14 @@ class ViewController: UIViewController {
     }
 
     @IBAction func btnPress(_ sender: Any) {
-        KeyAlert.shared.alertShow(message: "test", target: self, buttonTitles: ["ok"]) { (index, alertView) in
+        KeyAlert.shared.alertShow(message: "test", target: self, buttonTitles: ["확인"]) { (index, alertView) in
             print("button press")
             alertView.dismiss(animated: false, completion: nil)
+        }
+    }
+    @IBAction func btnPress2(_ sender: Any) {
+        KeyAlert.shared.toast(message: "test toast") {
+            print("toast finish")
         }
     }
     

@@ -17,7 +17,7 @@ typedef void (^ToastCompleted)(void);
 
 + (void)alertShowWithMessage:(nullable NSString *)message
                       target:(nonnull UIViewController *)target
-                buttonTitles:(nullable NSArray *)buttonTitles
+                buttonTitles:(nonnull NSArray *)buttonTitles
                     callBack:(nullable CallBackBlock)callBack;
 
 + (void)moveCenterPosision_x:(float)x
