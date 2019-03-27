@@ -7,6 +7,7 @@
 //
 
 ///git rebase test commit
+//git rebase test commit 3
 
 #import <UIKit/UIKit.h>
 
